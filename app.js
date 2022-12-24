@@ -98,16 +98,18 @@ app.post("/delete",async function(req, res){
         console.log(err);
       } else{
         console.log("Successfully deleted");
+            res.redirect("/");
       }
     });
-    res.redirect("/");
+
   }else{
       List.findOneAndUpdate({name: checkedItemListName}, {$pull: {items: {_id: checkedItemId}}}, function(err, foundList){
       if(!err){
         console.log("Success deleted");
+         res.redirect("/"+ checkedItemListName);
       }
     })
-    res.redirect("/"+ checkedItemListName);
+
   }
 })
 
