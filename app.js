@@ -69,17 +69,17 @@ app.get("/", function(req, res) {
     })
 });
 
-app.post("/",  function(req, res){
+app.post("/", async function(req, res){
   const itemName = req.body.newItem;
   const listName= req.body.list;
   const addItem= new Item ({
     name: itemName
   })
   if(listName==="Today"){
-    addItem.save()
+    await addItem.save()
      res.redirect("/");
   }else{
-    List.findOne({name: listName}, function(err, foundList){
+    await List.findOne({name: listName}, function(err, foundList){
       if(!err){
         foundList.items.push(addItem);
         foundList.save();
@@ -89,18 +89,22 @@ app.post("/",  function(req, res){
   }
 });
 
-app.post("/delete", function(req, res){
+app.post("/delete",async function(req, res){
   const checkedItemId= req.body.checkbox;
   const checkedItemListName= lodash.capitalize(req.body.list);
   if(checkedItemListName==='Today'){
     Item.findByIdAndDelete( checkedItemId, function(err){
-      console.log(err);
+      if(err){
+        console.log(err);
+      } else{
+        console.log("Successfully deleted");
+      }
     });
     res.redirect("/");
   }else{
-    List.findOneAndUpdate({name: checkedItemListName}, {$pull: {items: {_id: checkedItemId}}}, function(err, foundList){
+      List.findOneAndUpdate({name: checkedItemListName}, {$pull: {items: {_id: checkedItemId}}}, function(err, foundList){
       if(!err){
-        console.log("Success");
+        console.log("Success deleted");
       }
     })
     res.redirect("/"+ checkedItemListName);
